@@ -9,6 +9,14 @@
 <br>
 
 
+- [Conceptos](#conceptos)
+  - [Roscore](#roscore)
+- [Workspace](#workspace)
+  - [Catkin](#catkin)
+  - [Archivo .bashrc](#archivo-bashrc)
+    - [Red ROS](#red-ros)
+  - [Achivo CmakeList.txt](#achivo-cmakelisttxt)
+  - [Archivo package.xml](#archivo-packagexml)
 - [Herramientas](#herramientas)
   - [Rviz](#rviz)
   - [Gazebo](#gazebo)
@@ -46,6 +54,24 @@ El directorio que contiene el paquete se llama `package directory` y no puede ha
 El paquete contiene los procesos de ejecución `nodos`, librerías, scripts,
 archivos de configuración `Makefiles`, etc.
 
+> :memo: **Note:** Para crear un paquete debes navegar primero hasta el
+directorio src de tu workspace
+```
+cd ~/catkin_ws/src
+```
+`Las dependencias` son otros paquetes y bibliotecas que requiere
+nuestro paquete. Se pueden incluir ahora o a posteriori editando
+los ficheros de configuración CMakeLists.txt y package.xml
+
+> :memo: **Note:** Todos los paquetes del workspace se compilan juntos:
+```
+cd ~/catkin_ws/
+catkin_make
+```
+
+> :memo: **Note:** Alternativamente a la creación de un paquete lo podemos descargar de Github u otro repositorio. Pero seguirá siendo necesario ejecutar el comando **catkin_create_pkg**
+
+
 ## Pilas (Stack)
 Las pilas son una colección de paquetes con funcionalidad relacionada.
 
@@ -79,11 +105,41 @@ Un nodo ofrece un servicio y otro nodo lo utiliza enviando una petición y esper
 Directorio que contienen el código fuente de los programas que utilizará
 el paquete.
 
-## Directorio Launch
-launch contiene ficheros Launch (“.launch”), los cuales normalmente sirven para ejecutar varios nodos a la vez.
+## Directorio Launch & Launch files
+launch contiene ficheros Launch (“.launch”), los cuales normalmente sirven para ejecutar varios nodos a la vez. Son Ficheros XML que tienen extensión .launch.
+Para lanzar un launch file:
+```
+roslaunch package_name launch_file
+```
+> :bulb: **Tip:** Se recomienda crear una carpeta **launch** para incluir los launch files de nuestro paquete.
 
-## Nodo
+## Nodos
 Es un ejecutable dentro de un paquete ROS, escrito con la biblioteca de C++ `roscpp` o de Python `rospy`. Cada nodo es un proceso que realiza una tarea.
+
+> :bulb: **Tip:**  Los nodos son los ejecutables de ROS
+
+> Los nodos pueden publicar mensajes en un topic.
+
+> Los nodos pueden subscribirse a los topics para recibir
+mensajes. Todos los nodos subscritos a un topic reciben los
+mismos mensajes.
+
+>Los mensajes de un topic tienen la misma estructura de datos. Algunas estructuras están predefinidas en ROS, también se pueden crear nuevas estructuras de mensajes.
+
+Para crear un nodo en nuestro paquete, tendremos que editar las
+siguientes líneas del fichero ***CmakeLists.txt***:
+```
+add_executable(${PROJECT_NAME}_node src/my_first_package_node.cpp)
+
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} $
+{catkin_EXPORTED_TARGETS})
+
+target_link_libraries(${PROJECT_NAME}_node
+ ${catkin_LIBRARIES}
+)
+```
+Esto nos permitirá crear un nodo llamado ***my_first_package_node***. Podemos adaptar los cambios para crear otros nodos en el paquete. Luego tendremos que crear el fichero ***my_first_package_node.cpp***.
+
 
 ## Máster
 El ROS Master permite la comunicación entre los nodos. Sin el ROS Máster, los diferentes nodos del grafo no se podrían encontrar unos a otros, y, como consecuencia, no podrían intercambiar mensajes ni invocar servicios.
@@ -100,6 +156,92 @@ Los publicadores y los suscriptores no son conscientes de la existencia de los d
 
 ## Bags
 son un formato de almacenamiento de datos de ROS que permiten guardar datos enviados a través de mensajes, suscribiéndose al topic que se requiera y guardando los mensajes que se publiquen en un fichero. Estos ficheros también se pueden volver a reproducir en el mismo topic en el que fueron grabados. Son muy utilizadas para estudiar mensajes que publican los láseres, ya que a tiempo real publican mensajes.
+
+<br>
+
+# Conceptos
+## Roscore
+Son un conjunto de nodos y programas que son necesarios y por lo tanto habrá que ejecutar en cualquier aplicación de ROS. Roscore va a iniciar tres apartados:
+
+* ROS Master (necesario para que los demás nodos de ROS puedan comunicarse entre ellos.)
+* Servidor de parámetros (ROS Param)
+* Rosout (Equivalente en ROS a stdout/stderr)
+
+> :memo: **Note:** Un sistema ROS solo puede tener un único nodo máster corriendo
+
+# Workspace
+ROS está preparado para trabajar en un área de trabajo (workspace), esta área de trabajo no es más que una carpeta en nuestro ordenador. Esta carpeta es la carpeta en la que vamos a introducir los paquetes necesarios para ejecutar nuestra aplicación. La manera de agregar paquetes a esta carpeta y la forma y estructura que estos paquetes van a tener, viene dada por el sistema ```catkin``` (anteriormente “rosbuild”).
+
+> :bulb: **Tip:** Es posible utilizar varios workspaces
+> 
+Es posible utilizar varios workspaces, para ello creamos otro:
+```
+mkdir -p ~/otro_catkin_ws/src
+cd ~/otro_catkin_ws/
+catkin_make
+```
+Ahora habría que hacer ***source*** para que cuando abramos una consola nueva sepa que el workspace está en esa carpeta, para ello escribiremos ***source ~/otro_catkin_ws/devel/setup.bash*** al final del archivo `~/.bashrc` de nuestro sistema Linux. Quedando el final de nuestro archivo ~/.bashrc:
+```
+source /opt/ros/kinetic/setup.bash
+source ~/catkin_ws/devel/setup.bash
+source ~/otro_catkin_ws/devel/setup.bash
+```
+
+```La primera línea indica a Linux donde está instalado ROS, la segunda indica a Linux que active nuestro workspace creado en primer lugar y la segunda indica a Linux que active nuestro workspace creado en segundo lugar desactivando el primero```.
+
+> :bulb: **Tip:** El último workspace al que le hemos hecho source será el que está activado
+
+para cambiar de un workspace a otro basta con hacer “source” del workspace que queremos usar, por ejemplo para volver a activar el primer workspace escribiremos de nuevo:
+
+```
+source ~/catkin_ws/devel/setup.bash
+```
+esto activará el primer workspace y desactivara el segundo
+
+## Catkin
+no es más que una plantilla para hacer nuestros programas y paquetes, de tal manera que estos van a ser fácilmente interpretados por cualquier programa facilitando la portabilidad de estos.En definitiva, si queremos hacer una aplicación robótica con ROS, tanto el workspace como cada paquete dentro del workspace, deberán estar hechos bajo el sistema catkin.
+
+> :memo: **Note:** El nuevo sistema de compilado para ROS es "catkin", mientras que "rosbuild" lo es para los sistemas ROS viejos.
+
+## Archivo .bashrc
+### Red ROS
+Se puede configurar el .bashrc de cada ordenador en la red LAN para
+que el máster se ejecute en un ordenador y los otros ordenadores se
+conecten a él.
+
+http://wiki.ros.org/ROS/Tutorials/MultipleMachines
+
+## Achivo CmakeList.txt
+Es como la receta, es una plantilla, de tal manera que, si otro paquete u otro workspace quiere usar nuestro workspace o un paquete contenido en este, este archivo le ayudará a comprender la información.
+
+```Catkin``` se usa para poder construir software, para ello se necesita información como puede ser donde se encuentra el código fuente, donde están las librerías, dependencias, etc.. Toda esta información se encuentra en el archivo ```CmakeLists.txt```
+
+El fichero CMakeLists.txt de nuestro paquete contiene información acerca de la forma de compilar nuestro paquete, habrá que editarlo cada vez que:
+
+* Se cree un nuevo nodo en el paquete
+* Se creen mensajes, servicios o bibliotecas
+* Añadamos dependencias, etc.
+
+
+## Archivo package.xml
+se encargará de definir el nombre del paquete, el número de versión de este, autores y lo más importante, dependencias.
+
+El fichero ```package.xml``` contiene metadatos tales como número de versión de nuestro paquete, licencia de uso, autor e información sobre dependencias. Habrá que editarlo para actualizar los metadatos y, especialmente, cuando se añadan
+dependencias.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+
 
 # Herramientas 
 
