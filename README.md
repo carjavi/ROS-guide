@@ -9,10 +9,24 @@
 <br>
 
 
-- [Conceptos](#conceptos)
-  - [Roscore](#roscore)
+- [Robot Operating System (ROS)](#robot-operating-system-ros)
+- [Paquetes / Packages](#paquetes--packages)
+- [Install ROS Packages and Dependencies](#install-ros-packages-and-dependencies)
+  - [Install Package from a Repository](#install-package-from-a-repository)
+  - [Package dependencies](#package-dependencies)
+  - [Pilas (Stack)](#pilas-stack)
+- [Manifiesto del paquete](#manifiesto-del-paquete)
+- [Tipos de mensajes](#tipos-de-mensajes)
+- [Servicios](#servicios)
+- [Directorio SRC o scripts](#directorio-src-o-scripts)
+- [Directorio Launch \& Launch files](#directorio-launch--launch-files)
+- [Nodos](#nodos)
+  - [Máster](#máster)
+- [Topics](#topics)
+- [Bags](#bags)
+- [Roscore](#roscore)
 - [Workspace](#workspace)
-  - [Catkin](#catkin)
+- [Catkin](#catkin)
   - [Archivo .bashrc](#archivo-bashrc)
     - [Red ROS](#red-ros)
   - [Achivo CmakeList.txt](#achivo-cmakelisttxt)
@@ -41,10 +55,12 @@
   - [Navegación autónoma en un mapa conocido](#navegación-autónoma-en-un-mapa-conocido)
   - [Aparcamiento automático](#aparcamiento-automático)
 
-## Robot Operating System (ROS)
+# Robot Operating System (ROS)
 Entorno de desarrollo utilizado para el desarrollo de aplicaciones robóticas. Es de código abierto,cuyo código fuente puede ser estudiado, modificado y utilizado libremente con cualquier finalidad. Proporciona librerías y herramientas para el desarrollo de programas robóticos. No es un sistema operativo, sino que es un marco de trabajo o “framework”.
 
-## Paquetes
+<br>
+
+# Paquetes / Packages
 Todo el software de ROS está organizado en paquetes. Un paquete es una colección coherente de ficheros (ejecutables y ficheros de soporte) que sirven para un propósito específico.
 
 Estos paquetes son definidos por un manifiesto `fichero package.xml` que da información sobre el paquete, incluyendo su nombre, versión, descripción, información de licencia, dependencias.
@@ -71,14 +87,56 @@ catkin_make
 
 > :memo: **Note:** Alternativamente a la creación de un paquete lo podemos descargar de Github u otro repositorio. Pero seguirá siendo necesario ejecutar el comando **catkin_create_pkg**
 
+<br>
+
+# Install ROS Packages and Dependencies 
+## Install Package from a Repository
+Add your package to ~/catkin_ws/src/(mypackage)
+```
+cd ~/catkin_ws/src
+git clone https://github.com/xxxxxxxxxxxx.git
+cd ..
+catkin_make
+```
+
+***NOTAS***: Las dependencias son paquetes «third-party» que deben ser instalados para el funcionamiento del paquete
+
+> :bulb: **Tip:** Para verificar que los paquetes estan disponible para ROS
+```
+rospack find (name package)  
+```
+## Package dependencies
+> :bulb: **Tip:** para verificar si hay o no dependencias
+```
+rosdep check (package) 
+```
+si todas las dependencias estan ok deberia decir `“All system dependencies have been satisfied”`. Sino hay que instalar o actualizarlos.
+```
+rosdep update
+rosdep install <package_name>
+```
+> :bulb: **Tip:** si queremos instalar todas las dependencias de los paquetes ROS que tenemos instalados con un único comando:
+```
+cd ~/catkin_ws/src
+rosdep install --from-paths . --ignore-src -y
+catkin_make
+```
+Descarga las dependencias descritas en los archivos package.xml. No es necesario ejecutar esto cada vez que desees compilar el workspace, pero es útil si modificas el archivo package.xml.
+
+
+<br>
 
 ## Pilas (Stack)
 Las pilas son una colección de paquetes con funcionalidad relacionada.
 
-## Manifiesto del paquete
+<br>
+
+# Manifiesto del paquete
 El manifiesto `package.xml` proporciona información sobre el paquete incluyendo su nombre, versión, descripción, información de licencia, dependencias, paquetes exportados.
 
-## Tipos de mensajes
+<br>
+
+# Tipos de mensajes
 Los mensajes son datos enviados de un proceso (nodo) a otro.
 
 El directorio msg contiene información con las descripciones de los mensajes en un archivo “.msg”. Este define las estructuras de datos para los mensajes que publican los diversos procesos. En ese archivo hay dos partes: campos y constantes. Los campos son los datos que se envían dentro del mensaje. Las constantes definen valores útiles que se pueden usar para interpretar esos campos.
@@ -93,27 +151,38 @@ std_msgs/Int32
 std_msgs/bool
 std_msgs/Empty
 ```
+<br>
 
-## Servicios
+# Servicios
 Los nodos también se pueden comunicar a través de un patrón de interacción entre nodos cliente-servidor, apropiado para las interacciones de petición-respuesta.
 
 Utilizan dos mensajes, uno para petición y otro para respuesta.
 
 Un nodo ofrece un servicio y otro nodo lo utiliza enviando una petición y esperando una respuesta.
 
-## Directorio SRC o scripts
+<br>
+
+# Directorio SRC o scripts
 Directorio que contienen el código fuente de los programas que utilizará
 el paquete.
 
-## Directorio Launch & Launch files
+> :memo: **Note:** `src` no tiene una única ubicación en el workspace, también existe un mismo directorio en el subdirectorio devel. Este segundo directorio contiene todos los ejecutables compilados del directorio general src.
+
+<br>
+
+# Directorio Launch & Launch files
 launch contiene ficheros Launch (“.launch”), los cuales normalmente sirven para ejecutar varios nodos a la vez. Son Ficheros XML que tienen extensión .launch.
 Para lanzar un launch file:
 ```
 roslaunch package_name launch_file
 ```
 > :bulb: **Tip:** Se recomienda crear una carpeta **launch** para incluir los launch files de nuestro paquete.
+>
+> Recuerda que para ejecutar estos comandos debes abrir un terminal (Ctrl + Alt + T).
 
-## Nodos
+<br>
+
+# Nodos
 Es un ejecutable dentro de un paquete ROS, escrito con la biblioteca de C++ `roscpp` o de Python `rospy`. Cada nodo es un proceso que realiza una tarea.
 
 > :bulb: **Tip:**  Los nodos son los ejecutables de ROS
@@ -140,6 +209,7 @@ target_link_libraries(${PROJECT_NAME}_node
 ```
 Esto nos permitirá crear un nodo llamado ***my_first_package_node***. Podemos adaptar los cambios para crear otros nodos en el paquete. Luego tendremos que crear el fichero ***my_first_package_node.cpp***.
 
+<br>
 
 ## Máster
 El ROS Master permite la comunicación entre los nodos. Sin el ROS Máster, los diferentes nodos del grafo no se podrían encontrar unos a otros, y, como consecuencia, no podrían intercambiar mensajes ni invocar servicios.
@@ -147,20 +217,24 @@ El ROS Master permite la comunicación entre los nodos. Sin el ROS Máster, los 
 Al ejecutar el ROS Máster, también se ejecuta el servidor de parámetros `Parameter Server`, el cual utilizan los nodos para almacenar y recuperar parámetros en tiempo de ejecución.Además, se ejecuta el nodo `rosout`, el cual se comporta como la salida estándar. Estos tres nodos siempre van de la
 mano.
 
-## Topics
+<br>
+
+# Topics
 Los nodos se pueden comunicar a través de un patrón de interacción publicador-suscriptor mediante los mensajes. Para poder comunicarse, se crean los topics, que son canales de información entre nodos. Luego un nodo puede comunicarse con otro publicando mensajes en un topic al cual el otro nodo tiene que estar suscrito (suscriptor).
 
 Un topic puede tener diversos publicadores y suscriptores concurrentes y un nodo puede publicar y/o suscribirse a varios topics.
 
 Los publicadores y los suscriptores no son conscientes de la existencia de los demás.
 
-## Bags
+<br>
+
+# Bags
 son un formato de almacenamiento de datos de ROS que permiten guardar datos enviados a través de mensajes, suscribiéndose al topic que se requiera y guardando los mensajes que se publiquen en un fichero. Estos ficheros también se pueden volver a reproducir en el mismo topic en el que fueron grabados. Son muy utilizadas para estudiar mensajes que publican los láseres, ya que a tiempo real publican mensajes.
 
 <br>
 
-# Conceptos
-## Roscore
+
+# Roscore
 Son un conjunto de nodos y programas que son necesarios y por lo tanto habrá que ejecutar en cualquier aplicación de ROS. Roscore va a iniciar tres apartados:
 
 * ROS Master (necesario para que los demás nodos de ROS puedan comunicarse entre ellos.)
@@ -168,6 +242,8 @@ Son un conjunto de nodos y programas que son necesarios y por lo tanto habrá qu
 * Rosout (Equivalente en ROS a stdout/stderr)
 
 > :memo: **Note:** Un sistema ROS solo puede tener un único nodo máster corriendo
+
+<br>
 
 # Workspace
 ROS está preparado para trabajar en un área de trabajo (workspace), esta área de trabajo no es más que una carpeta en nuestro ordenador. Esta carpeta es la carpeta en la que vamos a introducir los paquetes necesarios para ejecutar nuestra aplicación. La manera de agregar paquetes a esta carpeta y la forma y estructura que estos paquetes van a tener, viene dada por el sistema ```catkin``` (anteriormente “rosbuild”).
@@ -198,12 +274,16 @@ source ~/catkin_ws/devel/setup.bash
 ```
 esto activará el primer workspace y desactivara el segundo
 
-## Catkin
-no es más que una plantilla para hacer nuestros programas y paquetes, de tal manera que estos van a ser fácilmente interpretados por cualquier programa facilitando la portabilidad de estos.En definitiva, si queremos hacer una aplicación robótica con ROS, tanto el workspace como cada paquete dentro del workspace, deberán estar hechos bajo el sistema catkin.
+<br>
+
+# Catkin
+No es más que una plantilla para hacer nuestros programas y paquetes, de tal manera que estos van a ser fácilmente interpretados por cualquier programa facilitando la portabilidad de estos.En definitiva, si queremos hacer una aplicación robótica con ROS, tanto el workspace como cada paquete dentro del workspace, deberán estar hechos bajo el sistema catkin.
 
 > :memo: **Note:** El nuevo sistema de compilado para ROS es "catkin", mientras que "rosbuild" lo es para los sistemas ROS viejos.
 
 ## Archivo .bashrc
+Este archivo permite configurar varias cosas en ROS, permite instalar varias distribuciones ROS (por ejemplo, indigo y kinetic) en la misma computadora y cambiar entre ellas, permite configurar una Red entre computadores corriendo ROS. etc. 
+
 ### Red ROS
 Se puede configurar el .bashrc de cada ordenador en la red LAN para
 que el máster se ejecute en un ordenador y los otros ordenadores se
