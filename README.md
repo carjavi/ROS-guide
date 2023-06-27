@@ -14,14 +14,14 @@
 - [Install ROS Packages and Dependencies](#install-ros-packages-and-dependencies)
   - [Install Package from a Repository](#install-package-from-a-repository)
   - [Package dependencies](#package-dependencies)
-  - [Pilas (Stack)](#pilas-stack)
+- [Pilas (Stack)](#pilas-stack)
 - [Manifiesto del paquete](#manifiesto-del-paquete)
 - [Tipos de mensajes](#tipos-de-mensajes)
 - [Servicios](#servicios)
 - [Directorio SRC o scripts](#directorio-src-o-scripts)
 - [Directorio Launch \& Launch files](#directorio-launch--launch-files)
 - [Nodos](#nodos)
-  - [Máster](#máster)
+- [Máster](#máster)
 - [Topics](#topics)
 - [Bags](#bags)
 - [Roscore](#roscore)
@@ -126,7 +126,7 @@ Descarga las dependencias descritas en los archivos package.xml. No es necesario
 
 <br>
 
-## Pilas (Stack)
+# Pilas (Stack)
 Las pilas son una colección de paquetes con funcionalidad relacionada.
 
 <br>
@@ -211,7 +211,7 @@ Esto nos permitirá crear un nodo llamado ***my_first_package_node***. Podemos a
 
 <br>
 
-## Máster
+# Máster
 El ROS Master permite la comunicación entre los nodos. Sin el ROS Máster, los diferentes nodos del grafo no se podrían encontrar unos a otros, y, como consecuencia, no podrían intercambiar mensajes ni invocar servicios.
 
 Al ejecutar el ROS Máster, también se ejecuta el servidor de parámetros `Parameter Server`, el cual utilizan los nodos para almacenar y recuperar parámetros en tiempo de ejecución.Además, se ejecuta el nodo `rosout`, el cual se comporta como la salida estándar. Estos tres nodos siempre van de la
