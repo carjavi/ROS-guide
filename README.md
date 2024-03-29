@@ -13,6 +13,7 @@
 - [Paquetes / Packages](#paquetes--packages)
 - [Install ROS Packages and Dependencies](#install-ros-packages-and-dependencies)
   - [Install Package from a Repository](#install-package-from-a-repository)
+  - [Note:](#note)
   - [Package dependencies](#package-dependencies)
 - [Pilas (Stack)](#pilas-stack)
 - [Manifiesto del paquete](#manifiesto-del-paquete)
@@ -105,6 +106,25 @@ catkin_make
 ```
 rospack find (name package)  
 ```
+## Note:
+A menudo, pero no siempre, un paquete depende de otros paquetes que pueden o no estar instalados en su sistema. Si recibe un error de dependencia al intentar catkin_make, es posible que le falten dependencias. <br>
+Verifiquemos que todo lo que necesitamos para usar este paquete esté instalado. (Tenga en cuenta que si aún no ha ejecutado rosdep, deberá ejecutar > :bulb: **Tip:** Para verificar que los paquetes estan disponible para ROS ```sudo rosdep init```.)
+```
+rosdep update
+rosdep check <package-name>
+```
+
+Esto debería decirnos si hay dependencias no satisfechas. Si hay dependencia por instalar dira **“System dependencies have not been satisfied”**  podemos instalarlos con
+```
+rosdep update
+rosdep install <package-name>
+```
+
+sino dira **“All system dependencies have been satisfied”**
+
+Alli si podemos compilar todo.
+
+
 ## Package dependencies
 > :bulb: **Tip:** para verificar si hay o no dependencias
 ```
